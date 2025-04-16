@@ -1,17 +1,52 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import LoginForm from "./pages/Login/Login";
+import App from "./App";
+import "leaflet/dist/leaflet.css";
+import "./styles/Main.css";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+function MainWrapper() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("user_id")
+  );
+
+  return (
+    <Router>
+      <Main
+        isAuthenticated={isAuthenticated}
+        setIsAuthenticated={setIsAuthenticated}
+      />
+    </Router>
+  );
+}
+
+function Main({ isAuthenticated, setIsAuthenticated }) {
+  return (
+    <Routes>
+      {/* Trang login */}
+      <Route
+        path="/login"
+        element={<LoginForm setIsAuthenticated={setIsAuthenticated} />}
+      />
+
+      {/* Route bảo vệ App */}
+      <Route
+        path="/*"
+        element={isAuthenticated ? <App /> : <Navigate to="/login" replace />}
+      />
+    </Routes>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <MainWrapper />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
